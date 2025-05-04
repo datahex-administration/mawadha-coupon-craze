@@ -39,10 +39,13 @@ export function useRegistrationForm() {
     const couponCode = generateCouponCode(values.name);
     console.log("Generated coupon code:", couponCode);
     
+    // Clean the phone number by trimming any whitespace
+    const cleanedWhatsapp = values.whatsapp.trim();
+    
     // Create user object
     const user = {
       name: values.name,
-      whatsapp: values.whatsapp.trim(),
+      whatsapp: cleanedWhatsapp,
       country_code: values.countryCode,
       age: parseInt(values.age),
       marital_status: values.maritalStatus,
@@ -52,12 +55,12 @@ export function useRegistrationForm() {
     
     try {
       // Check if the user already exists with this phone number
-      console.log("Checking for existing user with:", values.countryCode, values.whatsapp);
+      console.log("Checking for existing user with:", values.countryCode, cleanedWhatsapp);
       const { data: existingUser, error: lookupError } = await supabase
         .from('users')
         .select('coupon_code')
         .eq('country_code', values.countryCode)
-        .eq('whatsapp', values.whatsapp.trim())
+        .eq('whatsapp', cleanedWhatsapp)
         .maybeSingle();
       
       console.log("Existing user check result:", existingUser, lookupError);
@@ -73,19 +76,20 @@ export function useRegistrationForm() {
         // User already exists, redirect to their coupon
         console.log("User already exists, redirecting to coupon:", existingUser.coupon_code);
         toast.success('You are already registered. Redirecting to your coupon!');
-        setTimeout(() => {
-          navigate(`/coupon?code=${existingUser.coupon_code}`);
-        }, 1000);
+        // Redirect immediately without delay
+        navigate(`/coupon?code=${existingUser.coupon_code}`);
         setIsSubmitting(false);
         return;
       }
       
-      // Insert user data into Supabase
+      // Insert user data into Supabase with anon key (public access)
       console.log("Inserting new user:", user);
+      
+      // Use the .insert().select() pattern to get back the inserted record in one go
       const { data: insertedUser, error } = await supabase
         .from('users')
         .insert([user])
-        .select('coupon_code')
+        .select('*')
         .single();
       
       if (error) {
@@ -97,15 +101,11 @@ export function useRegistrationForm() {
       
       console.log("Registration successful, inserted user:", insertedUser);
       
-      // Redirect to coupon page with the data
+      // Redirect to coupon page with the coupon code
       toast.success('Registration successful!');
       
-      // Use the inserted user's coupon code if available, otherwise use the generated one
-      const finalCouponCode = insertedUser?.coupon_code || couponCode;
-      console.log("Redirecting to coupon:", finalCouponCode);
-      
-      // Immediate redirect to coupon page
-      navigate(`/coupon?code=${finalCouponCode}`);
+      // Navigate immediately to the coupon page
+      navigate(`/coupon?code=${insertedUser.coupon_code}`);
       
     } catch (error) {
       console.error("Error submitting form:", error);

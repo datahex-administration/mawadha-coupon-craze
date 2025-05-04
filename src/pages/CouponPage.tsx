@@ -16,12 +16,15 @@ const CouponPage: React.FC = () => {
 
   useEffect(() => {
     if (!couponCode) {
+      console.error("No coupon code provided in URL");
       navigate('/');
       return;
     }
     
     const fetchUser = async () => {
       try {
+        console.log("Fetching coupon with code:", couponCode);
+        
         // Find user with this coupon code from Supabase
         const { data, error } = await supabase
           .from('users')
@@ -42,6 +45,8 @@ const CouponPage: React.FC = () => {
           setTimeout(() => navigate('/coupon-status'), 2000);
           return;
         }
+        
+        console.log("Coupon found:", data);
         
         // Convert Supabase snake_case to camelCase for our frontend types
         const userData: User = {

@@ -37,10 +37,11 @@ const CouponStatus: React.FC = () => {
     }
     
     try {
-      // Trim the phone number to remove any spaces
+      // Trim and clean the phone number to remove spaces
       const trimmedPhoneNumber = phoneNumber.trim();
       console.log(`Searching for user with country_code=${countryCode}, whatsapp=${trimmedPhoneNumber}`);
       
+      // Query the database for the coupon
       const { data, error } = await supabase
         .from('users')
         .select('coupon_code, name')
@@ -60,9 +61,8 @@ const CouponStatus: React.FC = () => {
       if (data) {
         // User found, redirect to their coupon
         toast.success(`Coupon found for ${data.name || 'your number'}!`);
-        setTimeout(() => {
-          navigate(`/coupon?code=${data.coupon_code}`);
-        }, 1000);
+        // Navigate immediately without delay
+        navigate(`/coupon?code=${data.coupon_code}`);
       } else {
         toast.error('No coupon found for this phone number');
       }
