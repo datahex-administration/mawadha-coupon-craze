@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -61,7 +60,6 @@ const CouponStatus: React.FC = () => {
       if (data) {
         // User found, redirect to their coupon
         toast.success(`Coupon found for ${data.name || 'your number'}!`);
-        // Navigate immediately without delay
         navigate(`/coupon?code=${data.coupon_code}`);
       } else {
         toast.error('No coupon found for this phone number');

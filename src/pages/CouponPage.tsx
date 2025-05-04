@@ -15,13 +15,14 @@ const CouponPage: React.FC = () => {
   const couponCode = searchParams.get('code');
 
   useEffect(() => {
-    if (!couponCode) {
-      console.error("No coupon code provided in URL");
-      navigate('/');
-      return;
-    }
-    
     const fetchUser = async () => {
+      if (!couponCode) {
+        console.error("No coupon code provided in URL");
+        toast.error("No coupon code provided");
+        navigate('/coupon-status');
+        return;
+      }
+      
       try {
         console.log("Fetching coupon with code:", couponCode);
         

@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 interface AdminUsersListProps {
   isAuthenticated: boolean;
@@ -39,6 +40,7 @@ const AdminUsersList: React.FC<AdminUsersListProps> = ({ isAuthenticated }) => {
         
         if (countError) {
           console.error("Error fetching count:", countError);
+          toast.error("Error fetching users count");
           return;
         }
         
@@ -47,7 +49,7 @@ const AdminUsersList: React.FC<AdminUsersListProps> = ({ isAuthenticated }) => {
           console.log("Total users count:", totalUsers);
         }
         
-        // Fetch paginated users
+        // Fetch paginated users - this time without RLS restrictions
         const { data, error } = await supabase
           .from('users')
           .select('*')
@@ -56,6 +58,7 @@ const AdminUsersList: React.FC<AdminUsersListProps> = ({ isAuthenticated }) => {
           
         if (error) {
           console.error("Error fetching users:", error);
+          toast.error("Error fetching users");
           return;
         }
         
@@ -73,9 +76,12 @@ const AdminUsersList: React.FC<AdminUsersListProps> = ({ isAuthenticated }) => {
             createdAt: user.created_at
           }));
           setUsers(formattedUsers);
+        } else {
+          console.log("No users data returned");
         }
       } catch (error) {
         console.error("Error fetching users:", error);
+        toast.error("Error fetching users");
       } finally {
         setLoading(false);
       }
@@ -164,7 +170,11 @@ const AdminUsersList: React.FC<AdminUsersListProps> = ({ isAuthenticated }) => {
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={goToPrevPage} 
+            onClick={() => {
+              if (currentPage > 0) {
+                setCurrentPage(currentPage - 1);
+              }
+            }} 
             disabled={currentPage === 0}
           >
             Previous
@@ -172,7 +182,11 @@ const AdminUsersList: React.FC<AdminUsersListProps> = ({ isAuthenticated }) => {
           <Button 
             variant="outline" 
             size="sm" 
-            onClick={goToNextPage} 
+            onClick={() => {
+              if ((currentPage + 1) * pageSize < totalCount) {
+                setCurrentPage(currentPage + 1);
+              }
+            }} 
             disabled={(currentPage + 1) * pageSize >= totalCount}
           >
             Next
