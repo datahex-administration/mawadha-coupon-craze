@@ -232,6 +232,7 @@ const AdminDashboard: React.FC = () => {
                     <TableHead>WhatsApp</TableHead>
                     <TableHead>Age</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Attraction Reason</TableHead>
                     <TableHead>Coupon Code</TableHead>
                     <TableHead>Registration Date</TableHead>
                   </TableRow>
@@ -248,13 +249,14 @@ const AdminDashboard: React.FC = () => {
                         <TableCell>{user.countryCode} {user.whatsapp}</TableCell>
                         <TableCell>{user.age}</TableCell>
                         <TableCell>{user.maritalStatus}</TableCell>
+                        <TableCell className="max-w-xs truncate">{user.attractionReason}</TableCell>
                         <TableCell className="font-mono">{user.couponCode}</TableCell>
                         <TableCell>{new Date(user.createdAt || '').toLocaleDateString()}</TableCell>
                       </TableRow>
                     ))
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-6">
+                      <TableCell colSpan={7} className="text-center py-6">
                         {users.length === 0 ? "No participants yet" : "No matching results"}
                       </TableCell>
                     </TableRow>
