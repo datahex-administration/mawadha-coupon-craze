@@ -1,5 +1,6 @@
+
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import CouponCard from '@/components/CouponCard';
 import { User } from '@/types';
@@ -118,14 +119,23 @@ const CouponPage: React.FC = () => {
         ))}
       </div>
       
+      <div className="absolute top-4 right-4">
+        <Link 
+          to="/admin" 
+          className="text-white/70 text-xs hover:text-white transition-colors"
+        >
+          Admin
+        </Link>
+      </div>
+      
       <div className="text-center text-white mb-6">
         <h1 className="text-2xl md:text-3xl font-bold">Your Gift Voucher is Ready!</h1>
         <p className="text-mawadha-light mt-2">
-          Congratulations {user.name}! Here is your coupon for the lucky draw.
+          Congratulations {user?.name}! Here is your coupon for the lucky draw.
         </p>
       </div>
       
-      <CouponCard couponCode={user.couponCode} />
+      <CouponCard couponCode={user?.couponCode || ''} />
       
       <div className="mt-8 text-center">
         <Button 
@@ -137,17 +147,15 @@ const CouponPage: React.FC = () => {
         </Button>
       </div>
       
-      <div className={`mt-4 text-center w-full fixed bottom-0 p-2 ${isMobile ? 'flex flex-col gap-1' : 'flex justify-between items-center'}`}>
-        <div className={`${isMobile ? 'mb-1' : 'w-20'}`}>
-          <a 
-            href="https://datahex.co" 
-            target="_blank" 
-            rel="noopener noreferrer" 
-            className="text-white font-medium hover:text-blue-300 transition-colors"
-          >
-            Powered by DataHex
-          </a>
-        </div>
+      <div className={`mt-4 text-center w-full p-4 ${isMobile ? 'flex flex-col gap-1' : ''}`}>
+        <a 
+          href="https://datahex.co" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-white font-medium hover:text-blue-300 transition-colors"
+        >
+          Powered by DataHex
+        </a>
       </div>
     </div>
   );

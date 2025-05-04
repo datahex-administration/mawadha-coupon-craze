@@ -1,5 +1,6 @@
+
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -67,6 +68,15 @@ const CouponStatus: React.FC = () => {
         background: `linear-gradient(to right, #b71c8d, #800060)`,
       }}
     >
+      <div className="absolute top-4 right-4">
+        <Link 
+          to="/admin" 
+          className="text-white/70 text-xs hover:text-white transition-colors"
+        >
+          Admin
+        </Link>
+      </div>
+      
       <div className="w-full max-w-md bg-white/80 rounded-lg shadow-lg p-8 text-center">
         <img 
           src="/lovable-uploads/bf2aa2fe-7828-4fe3-92cc-cd036483a18f.png" 
@@ -132,8 +142,7 @@ const CouponStatus: React.FC = () => {
         </div>
       </div>
       
-      <div className={`mt-4 text-center w-full fixed bottom-0 p-2 ${isMobile ? 'flex flex-col gap-1' : 'flex justify-between items-center'}`}>
-        <div className={`${isMobile ? 'mb-1' : 'w-20'}`}></div>
+      <div className={`mt-4 text-center w-full p-4 ${isMobile ? 'flex flex-col gap-1' : ''}`}>
         <a 
           href="https://datahex.co" 
           target="_blank" 
@@ -142,7 +151,6 @@ const CouponStatus: React.FC = () => {
         >
           Powered by DataHex
         </a>
-        <div className={`${isMobile ? 'hidden' : 'w-20'}`}></div>
       </div>
     </div>
   );

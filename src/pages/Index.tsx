@@ -33,6 +33,15 @@ const Index = () => {
         ))}
       </div>
       
+      <div className="absolute top-4 right-4">
+        <Link 
+          to="/admin" 
+          className="text-white/70 text-xs hover:text-white transition-colors"
+        >
+          Admin
+        </Link>
+      </div>
+      
       <div className="text-center mb-6">
         <img 
           src="/lovable-uploads/bf2aa2fe-7828-4fe3-92cc-cd036483a18f.png" 
@@ -54,15 +63,7 @@ const Index = () => {
       
       <RegistrationForm />
       
-      <div className={`mt-4 text-center w-full fixed bottom-0 p-2 ${isMobile ? 'flex flex-col gap-2' : 'flex justify-between items-center'}`}>
-        <div className={`${isMobile ? 'mb-1' : 'w-20'}`}>
-          <Link 
-            to="/admin" 
-            className="text-white/70 text-xs hover:text-white transition-colors"
-          >
-            Admin
-          </Link>
-        </div>
+      <div className={`mt-4 text-center w-full p-4 ${isMobile ? 'flex flex-col gap-2' : ''}`}>
         <a 
           href="https://datahex.co" 
           target="_blank" 
@@ -71,7 +72,6 @@ const Index = () => {
         >
           Powered by DataHex
         </a>
-        <div className={`${isMobile ? 'hidden' : 'w-20'}`}></div>
       </div>
     </div>
   );
