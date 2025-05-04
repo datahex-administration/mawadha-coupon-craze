@@ -100,7 +100,7 @@ const RegistrationForm: React.FC = () => {
       }
       
       // Insert new user into Supabase
-      const { error: insertError } = await supabase
+      const { data: insertedUser, error: insertError } = await supabase
         .from('users')
         .insert([{
           name: user.name,
@@ -110,7 +110,9 @@ const RegistrationForm: React.FC = () => {
           marital_status: user.maritalStatus,
           attraction_reason: user.attractionReason,
           coupon_code: user.couponCode,
-        }]);
+        }])
+        .select()
+        .single();
       
       if (insertError) {
         console.error("Error submitting form:", insertError);
@@ -118,6 +120,8 @@ const RegistrationForm: React.FC = () => {
         setIsSubmitting(false);
         return;
       }
+      
+      console.log("Successfully registered user:", insertedUser);
       
       // Store in localStorage for backward compatibility (can be removed later)
       const existingLocalUsers = JSON.parse(localStorage.getItem('mawadhaUsers') || '[]');

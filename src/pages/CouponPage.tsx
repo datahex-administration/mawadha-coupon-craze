@@ -22,6 +22,8 @@ const CouponPage: React.FC = () => {
       }
       
       try {
+        console.log("Fetching user data for coupon code:", couponCode);
+        
         // Fetch user with this coupon code from Supabase
         const { data, error } = await supabase
           .from('users')
@@ -38,10 +40,13 @@ const CouponPage: React.FC = () => {
         
         if (!data) {
           // Invalid coupon code
+          console.error('No data found for coupon code:', couponCode);
           toast.error('Invalid coupon code');
           navigate('/');
           return;
         }
+        
+        console.log("Found user data:", data);
         
         // Map the Supabase data format to our User type
         const userData: User = {
@@ -71,7 +76,7 @@ const CouponPage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-mawadha-primary">
-        <div className="animate-pulse">Loading...</div>
+        <div className="text-white">Loading your coupon...</div>
       </div>
     );
   }
