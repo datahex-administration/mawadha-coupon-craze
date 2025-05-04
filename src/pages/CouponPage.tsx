@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -140,8 +139,7 @@ const CouponPage: React.FC = () => {
       <div className="mt-8 text-center">
         <Button 
           onClick={() => navigate('/')}
-          variant="outline"
-          className="border-white text-white hover:bg-white/10"
+          className="bg-white text-mawadha-primary border-white hover:bg-mawadha-primary hover:text-white"
         >
           Back to Home
         </Button>

@@ -1,10 +1,9 @@
-
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { countryCodes, validatePhoneNumber, generateCouponCode } from "../utils/countryCodes";
 import { User } from "../types";
 import { Input } from "@/components/ui/input";
@@ -183,6 +182,12 @@ const RegistrationForm: React.FC = () => {
         Register for Gift Voucher
       </h2>
       
+      <div className="text-center text-mawadha-primary text-xs mb-4">
+        <p>
+          Already registered? <Link to="/coupon-status" className="text-mawadha-secondary underline">Check your coupon status</Link>
+        </p>
+      </div>
+      
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
           {currentStep === 1 && (
@@ -207,7 +212,7 @@ const RegistrationForm: React.FC = () => {
                   name="countryCode"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Country</FormLabel>
+                      <FormLabel>Code</FormLabel>
                       <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger className="w-full">
@@ -217,7 +222,7 @@ const RegistrationForm: React.FC = () => {
                         <SelectContent>
                           {countryCodes.map((country) => (
                             <SelectItem key={country.code} value={country.code}>
-                              {country.country} ({country.code})
+                              {country.code}
                             </SelectItem>
                           ))}
                         </SelectContent>

@@ -79,7 +79,7 @@ const CouponCard: React.FC<CouponCardProps> = ({ couponCode }) => {
         Download Your Voucher
       </Button>
 
-      <p className="mt-4 text-center text-sm text-mawadha-primary max-w-xs">
+      <p className="mt-4 text-center text-sm text-white max-w-xs">
         Keep this code safe! It will be used for the lucky draw. You can download the voucher for your records.
       </p>
     </div>

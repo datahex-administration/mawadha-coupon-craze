@@ -55,12 +55,6 @@ const Index = () => {
         </div>
       </div>
       
-      <div className="text-center text-white text-xs mb-2">
-        <p>
-          Already registered? <Link to="/coupon-status" className="text-mawadha-secondary underline">Check your coupon status</Link>
-        </p>
-      </div>
-      
       <RegistrationForm />
       
       <div className={`mt-4 text-center w-full p-4 ${isMobile ? 'flex flex-col gap-2' : ''}`}>

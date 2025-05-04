@@ -106,7 +106,7 @@ const CouponStatus: React.FC = () => {
                   <SelectContent>
                     {countryCodes.map((country) => (
                       <SelectItem key={country.code} value={country.code}>
-                        {country.country} ({country.code})
+                        {country.code}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -134,8 +134,8 @@ const CouponStatus: React.FC = () => {
           
           <Button 
             onClick={() => navigate('/')}
-            variant="ghost"
-            className="w-full text-mawadha-primary"
+            variant="outline"
+            className="w-full bg-white text-mawadha-primary border-mawadha-primary hover:bg-mawadha-primary hover:text-white"
           >
             Back to Registration
           </Button>
