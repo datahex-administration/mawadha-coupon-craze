@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import CouponCard from '@/components/CouponCard';
 import { User } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const CouponPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -30,6 +31,7 @@ const CouponPage: React.FC = () => {
           
         if (error || !data) {
           console.error("Error fetching coupon:", error);
+          toast.error("Coupon not found");
           navigate('/');
           return;
         }
@@ -50,6 +52,7 @@ const CouponPage: React.FC = () => {
         setUser(userData);
       } catch (error) {
         console.error("Error:", error);
+        toast.error("Something went wrong");
         navigate('/');
       } finally {
         setIsLoading(false);
@@ -61,15 +64,20 @@ const CouponPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-mawadha-primary">
-        <div className="text-white animate-pulse">Loading your coupon...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-mawadha-primary to-purple-700">
+        <div className="text-white text-xl animate-pulse flex items-center space-x-2">
+          <div className="w-4 h-4 bg-white rounded-full animate-bounce"></div>
+          <div className="w-4 h-4 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+          <div className="w-4 h-4 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+          <span className="ml-2">Loading your coupon...</span>
+        </div>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-mawadha-primary">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-mawadha-primary to-purple-700">
         <div className="text-white">Coupon not found. Redirecting...</div>
       </div>
     );
@@ -79,7 +87,7 @@ const CouponPage: React.FC = () => {
     <div 
       className="min-h-screen flex flex-col items-center justify-center p-6"
       style={{
-        background: `linear-gradient(to right, #b71c8d, #800060)`,
+        background: `linear-gradient(135deg, #b71c8d 0%, #800060 100%)`,
         backgroundSize: 'cover',
         position: 'relative',
       }}
@@ -101,7 +109,7 @@ const CouponPage: React.FC = () => {
         ))}
       </div>
       
-      <div className="text-center text-white mb-6">
+      <div className="text-center text-white mb-6 animate-fade-in">
         <h1 className="text-2xl md:text-3xl font-bold">Your Gift Voucher is Ready!</h1>
         <p className="text-mawadha-light mt-2">
           Congratulations {user.name}! Here is your coupon for the lucky draw.
