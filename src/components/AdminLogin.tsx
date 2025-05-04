@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -24,6 +24,7 @@ const loginSchema = z.object({
 
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
   
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -34,15 +35,20 @@ const AdminLogin: React.FC = () => {
   });
 
   const onSubmit = (data: z.infer<typeof loginSchema>) => {
-    // Check credentials (in a real app, this would be authenticated against a backend)
-    if (data.username === 'admin' && data.password === '123@Admin') {
-      // Store admin login state
-      localStorage.setItem('mawadhaAdminAuthenticated', 'true');
-      toast.success('Login successful!');
-      navigate('/admin/dashboard');
-    } else {
-      toast.error('Invalid credentials');
-    }
+    setIsLoading(true);
+    // Add a slight delay to simulate server request (helps avoid race conditions)
+    setTimeout(() => {
+      // Check credentials (in a real app, this would be authenticated against a backend)
+      if (data.username === 'admin' && data.password === '123@Admin') {
+        // Store admin login state
+        localStorage.setItem('mawadhaAdminAuthenticated', 'true');
+        toast.success('Login successful!');
+        navigate('/admin/dashboard');
+      } else {
+        toast.error('Invalid credentials');
+      }
+      setIsLoading(false);
+    }, 500);
   };
 
   return (
@@ -81,8 +87,12 @@ const AdminLogin: React.FC = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full bg-mawadha-primary hover:bg-mawadha-dark">
-              Login
+            <Button 
+              type="submit" 
+              className="w-full bg-mawadha-primary hover:bg-mawadha-dark"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Logging in...' : 'Login'}
             </Button>
           </form>
         </Form>
