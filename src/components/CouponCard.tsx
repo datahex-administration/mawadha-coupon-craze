@@ -1,6 +1,7 @@
 
 import React, { useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { Printer, FileText } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import Logo from './Logo';
 
@@ -30,11 +31,15 @@ const CouponCard: React.FC<CouponCardProps> = ({ couponCode }) => {
     }
   };
 
+  const printCoupon = () => {
+    window.print();
+  };
+
   return (
     <div className="flex flex-col items-center w-full max-w-md mx-auto animate-fade-in">
       <div
         ref={couponRef}
-        className="w-full bg-white rounded-lg overflow-hidden shadow-xl mb-8 coupon-card"
+        className="w-full bg-white rounded-lg overflow-hidden shadow-xl mb-6 coupon-card"
       >
         {/* Coupon Header */}
         <div className="bg-mawadha-primary p-6 text-center">
@@ -72,12 +77,23 @@ const CouponCard: React.FC<CouponCardProps> = ({ couponCode }) => {
         </div>
       </div>
 
-      <Button
-        onClick={downloadCoupon}
-        className="bg-mawadha-secondary hover:bg-yellow-600 text-white font-bold"
-      >
-        Download Your Voucher
-      </Button>
+      <div className="flex flex-col sm:flex-row gap-3 w-full max-w-xs">
+        <Button
+          onClick={downloadCoupon}
+          className="bg-mawadha-secondary hover:bg-yellow-600 text-white font-bold flex items-center justify-center gap-2"
+        >
+          <FileText size={16} />
+          Download
+        </Button>
+        
+        <Button
+          onClick={printCoupon}
+          className="bg-mawadha-primary hover:bg-mawadha-primary/80 text-white font-bold flex items-center justify-center gap-2"
+        >
+          <Printer size={16} />
+          Print Voucher
+        </Button>
+      </div>
 
       <p className="mt-4 text-center text-sm text-white max-w-xs">
         Keep this code safe! It will be used for the lucky draw. You can download the voucher for your records.

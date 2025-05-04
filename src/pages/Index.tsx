@@ -9,7 +9,7 @@ const Index = () => {
   
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center p-6"
+      className="min-h-screen flex flex-col items-center justify-center p-4 md:p-6"
       style={{
         background: `linear-gradient(to right, #b71c8d, #800060)`,
         backgroundSize: 'cover',
@@ -42,27 +42,37 @@ const Index = () => {
         </Link>
       </div>
       
-      <div className="text-center mb-6">
+      <div className="text-center mb-4 md:mb-6">
         <img 
           src="/lovable-uploads/bf2aa2fe-7828-4fe3-92cc-cd036483a18f.png" 
           alt="Mawadha Logo" 
-          className="w-32 md:w-40 mx-auto mb-4" 
+          className="w-28 md:w-40 mx-auto mb-2 md:mb-4" 
         />
-        <h1 className="text-white text-3xl md:text-4xl font-bold mb-2">MAWADHA</h1>
-        <h2 className="text-white text-lg md:text-xl mb-4">Be a better half</h2>
-        <div className="bg-mawadha-secondary text-white inline-block px-6 py-2 rounded-md mb-6">
-          <h3 className="text-lg font-bold">GIFT VOUCHER GIVEAWAY</h3>
+        <h1 className="text-white text-2xl md:text-4xl font-bold mb-1 md:mb-2">MAWADHA</h1>
+        <h2 className="text-white text-base md:text-xl mb-2 md:mb-4">Be a better half</h2>
+        <div className="bg-mawadha-secondary text-white inline-block px-4 py-1 md:px-6 md:py-2 rounded-md mb-2 md:mb-4">
+          <h3 className="text-sm md:text-lg font-bold">GIFT VOUCHER GIVEAWAY</h3>
+        </div>
+        <div className="mt-2">
+          <a 
+            href="https://www.mawadha.com/" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-white text-xs md:text-sm hover:text-blue-200 transition-colors underline"
+          >
+            Visit www.mawadha.com
+          </a>
         </div>
       </div>
       
       <RegistrationForm />
       
-      <div className={`mt-4 text-center w-full p-4 ${isMobile ? 'flex flex-col gap-2' : ''}`}>
+      <div className="mt-4 text-center w-full p-2 md:p-4">
         <a 
           href="https://datahex.co" 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="text-white font-medium hover:text-blue-300 transition-colors"
+          className="text-white font-medium text-xs hover:text-blue-300 transition-colors"
         >
           Powered by DataHex
         </a>
