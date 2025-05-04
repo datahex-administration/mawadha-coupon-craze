@@ -45,9 +45,9 @@ const CouponCard: React.FC<CouponCardProps> = ({ couponCode }) => {
         <div className="bg-mawadha-primary p-6 text-center">
           <Logo />
           <h1 className="text-white text-3xl font-bold mb-1">GIFT VOUCHER</h1>
-          <p className="text-mawadha-secondary text-lg font-bold">AED 100/-</p>
-         <p className="text-white-600 text-sm mt-4">Validity Till: 31/12/25</p>
-            <p className="text-white-500 text-xs mt-2">T&C Apply*</p>
+          <p className="text-mawadha-secondary text-2xl font-bold">AED 100/-</p>
+         <p className="text-white text-sm mt-4 font-bold">Validity Till: 31/12/25</p>
+            <p className="text-white text-xs mt-2 font-bold">T&C Apply*</p>
         </div>
 
         {/* Coupon Body */}
