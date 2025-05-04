@@ -27,12 +27,19 @@ const CouponPage: React.FC = () => {
           .from('users')
           .select('*')
           .eq('coupon_code', couponCode)
-          .single();
+          .maybeSingle();
           
-        if (error || !data) {
+        if (error) {
           console.error("Error fetching coupon:", error);
+          toast.error("Error fetching coupon");
+          setTimeout(() => navigate('/coupon-status'), 2000);
+          return;
+        }
+        
+        if (!data) {
+          console.error("Coupon not found:", couponCode);
           toast.error("Coupon not found");
-          navigate('/');
+          setTimeout(() => navigate('/coupon-status'), 2000);
           return;
         }
         
@@ -53,7 +60,7 @@ const CouponPage: React.FC = () => {
       } catch (error) {
         console.error("Error:", error);
         toast.error("Something went wrong");
-        navigate('/');
+        setTimeout(() => navigate('/coupon-status'), 2000);
       } finally {
         setIsLoading(false);
       }
@@ -77,8 +84,24 @@ const CouponPage: React.FC = () => {
 
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-mawadha-primary to-purple-700">
-        <div className="text-white">Coupon not found. Redirecting...</div>
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-gradient-to-r from-mawadha-primary to-purple-700">
+        <div className="text-white text-center">
+          <h2 className="text-2xl font-bold mb-4">Coupon not found</h2>
+          <p className="mb-6">We couldn't find your coupon. Please check your registration status.</p>
+          <Button 
+            onClick={() => navigate('/coupon-status')}
+            className="bg-white text-mawadha-primary hover:bg-white/90 mb-3"
+          >
+            Find Your Coupon
+          </Button>
+          <Button 
+            onClick={() => navigate('/')}
+            variant="outline"
+            className="border-white text-white hover:bg-white/10"
+          >
+            Register Again
+          </Button>
+        </div>
       </div>
     );
   }

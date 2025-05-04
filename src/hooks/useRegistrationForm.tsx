@@ -49,19 +49,32 @@ export function useRegistrationForm() {
     };
     
     try {
+      // Check if the user already exists with this phone number
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('coupon_code')
+        .eq('country_code', values.countryCode)
+        .eq('whatsapp', values.whatsapp)
+        .maybeSingle();
+      
+      if (existingUser) {
+        // User already exists, redirect to their coupon
+        toast.success('You are already registered. Redirecting to your coupon!');
+        setTimeout(() => {
+          navigate(`/coupon?code=${existingUser.coupon_code}`);
+        }, 1000);
+        setIsSubmitting(false);
+        return;
+      }
+      
       // Insert user data into Supabase
       const { error } = await supabase
         .from('users')
         .insert([user]);
       
       if (error) {
-        if (error.code === '23505') {
-          // Unique violation error
-          toast.error("This phone number is already registered");
-        } else {
-          console.error("Supabase error:", error);
-          toast.error("Error registering. Please try again.");
-        }
+        console.error("Supabase error:", error);
+        toast.error("Error registering. Please try again.");
         setIsSubmitting(false);
         return;
       }

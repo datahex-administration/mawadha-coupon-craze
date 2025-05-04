@@ -13,6 +13,10 @@ const CouponStatus: React.FC = () => {
   const [countryCode, setCountryCode] = useState('+971');
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
+  
+  // Get the format for the selected country
+  const selectedCountry = countryCodes.find(c => c.code === countryCode);
+  const phoneFormat = selectedCountry?.format || 'XXXX XXXX';
 
   const handleSearch = async () => {
     setIsSearching(true);
@@ -30,7 +34,7 @@ const CouponStatus: React.FC = () => {
         .from('users')
         .select('coupon_code')
         .eq('country_code', countryCode)
-        .ilike('whatsapp', `%${phoneNumber}%`)
+        .eq('whatsapp', phoneNumber)
         .maybeSingle();
         
       if (error) {
@@ -106,7 +110,7 @@ const CouponStatus: React.FC = () => {
                 onChange={(e) => setPhoneNumber(e.target.value)}
               />
               <p className="text-xs text-gray-500 mt-1">
-                Format: {countryCodes.find(c => c.code === countryCode)?.format || 'XXXX XXXX'}
+                Format: {phoneFormat}
               </p>
             </div>
           </div>
