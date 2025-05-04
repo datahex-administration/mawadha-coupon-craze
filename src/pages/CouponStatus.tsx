@@ -1,25 +1,18 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { supabase } from '@/integrations/supabase/client';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { countryCodes, validatePhoneNumber } from '@/utils/countryCodes';
+import { User } from '@/types';
 
 const CouponStatus: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [countryCode, setCountryCode] = useState('+971');
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
-  
-  // Get the format for the selected country
-  const selectedCountry = countryCodes.find(c => c.code === countryCode);
-  const phoneFormat = selectedCountry?.format || 'XXXX XXXX';
 
-  const handleSearch = async () => {
+  const handleSearch = () => {
     setIsSearching(true);
-    console.log("Searching for:", { countryCode, phoneNumber });
     
     // Simple validation for phone format
     if (phoneNumber.trim().length < 5) {
@@ -28,41 +21,26 @@ const CouponStatus: React.FC = () => {
       return;
     }
     
-    // Validate phone number based on country code
-    if (!validatePhoneNumber(phoneNumber, countryCode)) {
-      toast.error(`Invalid phone number format for ${selectedCountry?.country || 'selected country'}`);
-      setIsSearching(false);
-      return;
-    }
-    
     try {
-      // Trim and clean the phone number to remove spaces
-      const trimmedPhoneNumber = phoneNumber.trim();
-      console.log(`Searching for user with country_code=${countryCode}, whatsapp=${trimmedPhoneNumber}`);
-      
-      // Query the database for the coupon
-      const { data, error } = await supabase
-        .from('users')
-        .select('coupon_code, name')
-        .eq('country_code', countryCode)
-        .eq('whatsapp', trimmedPhoneNumber)
-        .maybeSingle();
+      // In a real app, this would be a database lookup
+      const storedUsers = localStorage.getItem('mawadhaUsers');
+      if (storedUsers) {
+        const users = JSON.parse(storedUsers) as User[];
         
-      console.log("Search result:", data, error);
-      
-      if (error) {
-        console.error('Error searching for coupon:', error);
-        toast.error('An error occurred while searching');
-        setIsSearching(false);
-        return;
-      }
-      
-      if (data) {
-        // User found, redirect to their coupon
-        toast.success(`Coupon found for ${data.name || 'your number'}!`);
-        navigate(`/coupon?code=${data.coupon_code}`);
+        // Search for user by phone number
+        const user = users.find(u => u.whatsapp.includes(phoneNumber));
+        
+        if (user) {
+          // User found, redirect to their coupon
+          toast.success('Coupon found!');
+          setTimeout(() => {
+            navigate(`/coupon?code=${user.couponCode}`);
+          }, 1000);
+        } else {
+          toast.error('No coupon found for this phone number');
+        }
       } else {
-        toast.error('No coupon found for this phone number');
+        toast.error('No registrations found');
       }
     } catch (error) {
       console.error('Error searching for coupon:', error);
@@ -91,39 +69,16 @@ const CouponStatus: React.FC = () => {
         </h1>
         
         <div className="space-y-6">
-          <div className="space-y-4">
-            <div className="text-left">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Select Your Country Code
-              </label>
-              <Select value={countryCode} onValueChange={setCountryCode}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select country code" />
-                </SelectTrigger>
-                <SelectContent>
-                  {countryCodes.map((country) => (
-                    <SelectItem key={country.code} value={country.code}>
-                      {country.country} ({country.code})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="text-left">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Enter Your Phone Number
-              </label>
-              <Input
-                type="text"
-                placeholder="Your phone number"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Format: {phoneFormat}
-              </p>
-            </div>
+          <div className="text-left">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Enter Your Phone Number
+            </label>
+            <Input
+              type="text"
+              placeholder="Your phone number"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+            />
           </div>
           
           <Button 
