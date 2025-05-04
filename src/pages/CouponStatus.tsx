@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { countryCodes } from '@/utils/countryCodes';
+import { countryCodes, validatePhoneNumber } from '@/utils/countryCodes';
 
 const CouponStatus: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -24,6 +24,13 @@ const CouponStatus: React.FC = () => {
     // Simple validation for phone format
     if (phoneNumber.trim().length < 5) {
       toast.error('Please enter a valid phone number');
+      setIsSearching(false);
+      return;
+    }
+    
+    // Validate phone number based on country code
+    if (!validatePhoneNumber(phoneNumber, countryCode)) {
+      toast.error(`Invalid phone number format for ${selectedCountry?.country || 'selected country'}`);
       setIsSearching(false);
       return;
     }
