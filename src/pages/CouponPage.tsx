@@ -4,11 +4,13 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import CouponCard from '@/components/CouponCard';
 import { User } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
 
 const CouponPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const couponCode = searchParams.get('code');
 
   useEffect(() => {
@@ -17,27 +19,58 @@ const CouponPage: React.FC = () => {
       return;
     }
     
-    // Find user with this coupon code from localStorage (in a real app, this would be a database lookup)
-    const storedUsers = localStorage.getItem('mawadhaUsers');
-    if (storedUsers) {
-      const users = JSON.parse(storedUsers) as User[];
-      const matchedUser = users.find(u => u.couponCode === couponCode);
-      if (matchedUser) {
-        setUser(matchedUser);
-      } else {
-        // Invalid coupon code
+    const fetchUser = async () => {
+      try {
+        // Find user with this coupon code from Supabase
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('coupon_code', couponCode)
+          .single();
+          
+        if (error || !data) {
+          console.error("Error fetching coupon:", error);
+          navigate('/');
+          return;
+        }
+        
+        // Convert Supabase snake_case to camelCase for our frontend types
+        const userData: User = {
+          id: data.id,
+          name: data.name,
+          whatsapp: data.whatsapp,
+          countryCode: data.country_code,
+          age: data.age,
+          maritalStatus: data.marital_status as 'Single' | 'Engaged' | 'Married',
+          attractionReason: data.attraction_reason,
+          couponCode: data.coupon_code,
+          createdAt: data.created_at
+        };
+        
+        setUser(userData);
+      } catch (error) {
+        console.error("Error:", error);
         navigate('/');
+      } finally {
+        setIsLoading(false);
       }
-    } else {
-      // No users registered yet
-      navigate('/');
-    }
+    };
+    
+    fetchUser();
   }, [couponCode, navigate]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-mawadha-primary">
+        <div className="text-white animate-pulse">Loading your coupon...</div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-mawadha-primary">
-        <div className="animate-pulse">Loading...</div>
+        <div className="text-white">Coupon not found. Redirecting...</div>
       </div>
     );
   }

@@ -4,14 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { User } from '@/types';
+import { supabase } from '@/integrations/supabase/client';
 
 const CouponStatus: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     setIsSearching(true);
     
     // Simple validation for phone format
@@ -22,25 +22,28 @@ const CouponStatus: React.FC = () => {
     }
     
     try {
-      // In a real app, this would be a database lookup
-      const storedUsers = localStorage.getItem('mawadhaUsers');
-      if (storedUsers) {
-        const users = JSON.parse(storedUsers) as User[];
+      // Search for user by phone number in Supabase
+      const { data, error } = await supabase
+        .from('users')
+        .select('coupon_code')
+        .ilike('whatsapp', `%${phoneNumber}%`)
+        .maybeSingle();
         
-        // Search for user by phone number
-        const user = users.find(u => u.whatsapp.includes(phoneNumber));
-        
-        if (user) {
-          // User found, redirect to their coupon
-          toast.success('Coupon found!');
-          setTimeout(() => {
-            navigate(`/coupon?code=${user.couponCode}`);
-          }, 1000);
-        } else {
-          toast.error('No coupon found for this phone number');
-        }
+      if (error) {
+        console.error('Error searching for coupon:', error);
+        toast.error('An error occurred while searching');
+        setIsSearching(false);
+        return;
+      }
+      
+      if (data) {
+        // User found, redirect to their coupon
+        toast.success('Coupon found!');
+        setTimeout(() => {
+          navigate(`/coupon?code=${data.coupon_code}`);
+        }, 1000);
       } else {
-        toast.error('No registrations found');
+        toast.error('No coupon found for this phone number');
       }
     } catch (error) {
       console.error('Error searching for coupon:', error);

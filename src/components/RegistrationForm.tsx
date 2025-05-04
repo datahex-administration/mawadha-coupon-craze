@@ -9,10 +9,9 @@ import { countryCodes, validatePhoneNumber, generateCouponCode } from "../utils/
 import { User } from "../types";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Form,
   FormControl,
@@ -65,37 +64,33 @@ const RegistrationForm: React.FC = () => {
     const couponCode = generateCouponCode(values.name);
     
     // Create user object
-    const user: User = {
+    const user = {
       name: values.name,
       whatsapp: values.whatsapp,
-      countryCode: values.countryCode,
+      country_code: values.countryCode,
       age: parseInt(values.age),
-      maritalStatus: values.maritalStatus as 'Single' | 'Engaged' | 'Married',
-      attractionReason: values.attractionReason,
-      couponCode: couponCode,
-      createdAt: new Date().toISOString(),
+      marital_status: values.maritalStatus,
+      attraction_reason: values.attractionReason,
+      coupon_code: couponCode,
     };
     
     try {
-      // In a real app, here we would save the data to Supabase
-      console.log("User data to save:", user);
+      // Insert user data into Supabase
+      const { error } = await supabase
+        .from('users')
+        .insert([user]);
       
-      // Store in localStorage for demo
-      const existingUsers = JSON.parse(localStorage.getItem('mawadhaUsers') || '[]');
-      
-      // Check if phone number already exists
-      const phoneExists = existingUsers.some(
-        (u: User) => u.countryCode === user.countryCode && u.whatsapp === user.whatsapp
-      );
-      
-      if (phoneExists) {
-        toast.error("This phone number is already registered");
+      if (error) {
+        if (error.code === '23505') {
+          // Unique violation error
+          toast.error("This phone number is already registered");
+        } else {
+          console.error("Supabase error:", error);
+          toast.error("Error registering. Please try again.");
+        }
         setIsSubmitting(false);
         return;
       }
-      
-      // Add new user
-      localStorage.setItem('mawadhaUsers', JSON.stringify([...existingUsers, user]));
       
       // Redirect to coupon page with the data
       navigate(`/coupon?code=${couponCode}`);
@@ -193,28 +188,20 @@ const RegistrationForm: React.FC = () => {
               control={form.control}
               name="maritalStatus"
               render={({ field }) => (
-                <FormItem className="space-y-3">
+                <FormItem>
                   <FormLabel>Marital Status</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex space-x-2"
-                    >
-                      <div className="flex items-center space-x-1">
-                        <RadioGroupItem value="Single" id="single" />
-                        <Label htmlFor="single">Single</Label>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <RadioGroupItem value="Engaged" id="engaged" />
-                        <Label htmlFor="engaged">Engaged</Label>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <RadioGroupItem value="Married" id="married" />
-                        <Label htmlFor="married">Married</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Single">Single</SelectItem>
+                      <SelectItem value="Engaged">Engaged</SelectItem>
+                      <SelectItem value="Married">Married</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
