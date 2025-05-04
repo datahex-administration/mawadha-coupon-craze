@@ -4,10 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
+import { countryCodes } from '@/utils/countryCodes';
 
 const CouponStatus: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [countryCode, setCountryCode] = useState('+971');
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
@@ -25,10 +28,11 @@ const CouponStatus: React.FC = () => {
       // Clean up the phone number for search (remove spaces, dashes, etc.)
       const cleanPhone = phoneNumber.replace(/\s+/g, '').replace(/-/g, '');
       
-      // Search for user by phone number in Supabase
+      // Search for user by phone number and country code in Supabase
       const { data: users, error } = await supabase
         .from('users')
         .select('*')
+        .eq('country_code', countryCode)
         .ilike('whatsapp', `%${cleanPhone}%`);
       
       if (error) {
@@ -45,7 +49,7 @@ const CouponStatus: React.FC = () => {
           navigate(`/coupon?code=${users[0].coupon_code}`);
         }, 1000);
       } else {
-        toast.error('No coupon found for this phone number');
+        toast.error('No coupon found for this phone number and country code');
       }
     } catch (error) {
       console.error('Error searching for coupon:', error);
@@ -76,14 +80,37 @@ const CouponStatus: React.FC = () => {
         <div className="space-y-6">
           <div className="text-left">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Enter Your Phone Number
+              Enter Your Phone Details
             </label>
-            <Input
-              type="text"
-              placeholder="Your phone number"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
+            
+            <div className="grid grid-cols-3 gap-2">
+              <div className="col-span-1">
+                <Select 
+                  value={countryCode} 
+                  onValueChange={setCountryCode}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Code" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countryCodes.map((country) => (
+                      <SelectItem key={country.code} value={country.code}>
+                        {country.country} ({country.code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="col-span-2">
+                <Input
+                  type="text"
+                  placeholder="Your phone number"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                />
+              </div>
+            </div>
           </div>
           
           <Button 
