@@ -184,7 +184,7 @@ const RegistrationForm: React.FC = () => {
       
       <div className="text-center text-mawadha-primary text-xs mb-4">
         <p>
-          Already registered? <Link to="/coupon-status" className="text-mawadha-secondary underline">Check your coupon status</Link>
+          Already registered? <Link to="/coupon-status" className="text-mawadha-secondary-white underline">Check your coupon status</Link>
         </p>
       </div>
       
