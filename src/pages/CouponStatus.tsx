@@ -5,9 +5,12 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { countryCodes } from '@/utils/countryCodes';
 
 const CouponStatus: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [countryCode, setCountryCode] = useState('+971');
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
 
@@ -22,10 +25,11 @@ const CouponStatus: React.FC = () => {
     }
     
     try {
-      // Search for user by phone number in Supabase
+      // Search for user by phone number and country code in Supabase
       const { data, error } = await supabase
         .from('users')
         .select('coupon_code')
+        .eq('country_code', countryCode)
         .ilike('whatsapp', `%${phoneNumber}%`)
         .maybeSingle();
         
@@ -72,16 +76,39 @@ const CouponStatus: React.FC = () => {
         </h1>
         
         <div className="space-y-6">
-          <div className="text-left">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Enter Your Phone Number
-            </label>
-            <Input
-              type="text"
-              placeholder="Your phone number"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-            />
+          <div className="space-y-4">
+            <div className="text-left">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Select Your Country Code
+              </label>
+              <Select value={countryCode} onValueChange={setCountryCode}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select country code" />
+                </SelectTrigger>
+                <SelectContent>
+                  {countryCodes.map((country) => (
+                    <SelectItem key={country.code} value={country.code}>
+                      {country.country} ({country.code})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="text-left">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Enter Your Phone Number
+              </label>
+              <Input
+                type="text"
+                placeholder="Your phone number"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Format: {countryCodes.find(c => c.code === countryCode)?.format || 'XXXX XXXX'}
+              </p>
+            </div>
           </div>
           
           <Button 
