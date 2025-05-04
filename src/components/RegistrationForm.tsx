@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,10 +9,8 @@ import { countryCodes, validatePhoneNumber, generateCouponCode } from "../utils/
 import { User } from "../types";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Form,
@@ -37,6 +36,7 @@ const formSchema = z.object({
 
 const RegistrationForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
   
   const form = useForm<z.infer<typeof formSchema>>({
@@ -50,6 +50,38 @@ const RegistrationForm: React.FC = () => {
       attractionReason: "",
     },
   });
+
+  const nextStep = () => {
+    const { name, countryCode, whatsapp } = form.getValues();
+    
+    // Basic validation for the first step
+    if (!name || name.length < 2) {
+      form.setError("name", { message: "Name must be at least 2 characters." });
+      return;
+    }
+    
+    if (!countryCode) {
+      form.setError("countryCode", { message: "Country code is required." });
+      return;
+    }
+    
+    if (!whatsapp || whatsapp.length < 8) {
+      form.setError("whatsapp", { message: "Phone number is required." });
+      return;
+    }
+    
+    // Validate phone number
+    if (!validatePhoneNumber(whatsapp, countryCode)) {
+      form.setError("whatsapp", { message: "Invalid phone number for selected country code." });
+      return;
+    }
+    
+    setCurrentStep(2);
+  };
+
+  const prevStep = () => {
+    setCurrentStep(1);
+  };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
@@ -153,139 +185,156 @@ const RegistrationForm: React.FC = () => {
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter your full name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <div className="grid grid-cols-3 gap-2">
-            <FormField
-              control={form.control}
-              name="countryCode"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+          {currentStep === 1 && (
+            <>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Full Name</FormLabel>
                     <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Code" />
-                      </SelectTrigger>
+                      <Input placeholder="Enter your full name" {...field} />
                     </FormControl>
-                    <SelectContent>
-                      {countryCodes.map((country) => (
-                        <SelectItem key={country.code} value={country.code}>
-                          {country.country} ({country.code})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="whatsapp"
-              render={({ field }) => (
-                <FormItem className="col-span-2">
-                  <FormLabel>WhatsApp Number</FormLabel>
-                  <FormControl>
-                    <Input 
-                      type="tel" 
-                      placeholder="WhatsApp number" 
-                      {...field} 
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="grid grid-cols-3 gap-2">
+                <FormField
+                  control={form.control}
+                  name="countryCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Country</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Code" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {countryCodes.map((country) => (
+                            <SelectItem key={country.code} value={country.code}>
+                              {country.country} ({country.code})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="whatsapp"
+                  render={({ field }) => (
+                    <FormItem className="col-span-2">
+                      <FormLabel>WhatsApp Number</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="tel" 
+                          placeholder="WhatsApp number" 
+                          {...field} 
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <Button 
+                type="button" 
+                className="w-full bg-mawadha-primary hover:bg-mawadha-dark"
+                onClick={nextStep}
+              >
+                Next Step
+              </Button>
+            </>
+          )}
           
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="age"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Age</FormLabel>
-                  <FormControl>
-                    <Input type="number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="maritalStatus"
-              render={({ field }) => (
-                <FormItem className="space-y-3">
-                  <FormLabel>Marital Status</FormLabel>
-                  <FormControl>
-                    <RadioGroup
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      className="flex space-x-2"
-                    >
-                      <div className="flex items-center space-x-1">
-                        <RadioGroupItem value="Single" id="single" />
-                        <Label htmlFor="single">Single</Label>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <RadioGroupItem value="Engaged" id="engaged" />
-                        <Label htmlFor="engaged">Engaged</Label>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <RadioGroupItem value="Married" id="married" />
-                        <Label htmlFor="married">Married</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          
-          <FormField
-            control={form.control}
-            name="attractionReason"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>What attracts you the most in Mawadha?</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Please share what you like most about Mawadha"
-                    className="resize-none"
-                    rows={3}
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <Button 
-            type="submit" 
-            className="w-full bg-mawadha-primary hover:bg-mawadha-dark"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? "Processing..." : "Get Your Voucher"}
-          </Button>
+          {currentStep === 2 && (
+            <>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="age"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Age</FormLabel>
+                      <FormControl>
+                        <Input type="number" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="maritalStatus"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Marital Status</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select status" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Single">Single</SelectItem>
+                          <SelectItem value="Engaged">Engaged</SelectItem>
+                          <SelectItem value="Married">Married</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <FormField
+                control={form.control}
+                name="attractionReason"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>What attracts you the most in Mawadha?</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Please share what you like most about Mawadha"
+                        className="resize-none"
+                        rows={3}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  className="sm:w-1/3" 
+                  onClick={prevStep}
+                >
+                  Back
+                </Button>
+                <Button 
+                  type="submit" 
+                  className="sm:w-2/3 bg-mawadha-primary hover:bg-mawadha-dark"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Processing..." : "Get Your Voucher"}
+                </Button>
+              </div>
+            </>
+          )}
         </form>
       </Form>
     </div>

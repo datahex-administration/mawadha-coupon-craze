@@ -51,14 +51,7 @@ const Index = () => {
         </p>
       </div>
       
-      <div className="absolute bottom-4 right-4">
-        <Link 
-          to="/admin" 
-          className="text-xs text-white/60 hover:text-white/90"
-        >
-          Admin
-        </Link>
-      </div>
+      {/* Admin button removed as requested */}
     </div>
   );
 };
