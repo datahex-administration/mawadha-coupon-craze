@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,15 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 
 const AdminDashboard: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -22,6 +32,12 @@ const AdminDashboard: React.FC = () => {
   const [luckyWinner, setLuckyWinner] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const usersPerPage = 10;
   
   useEffect(() => {
     // Check if admin is authenticated
@@ -37,10 +53,30 @@ const AdminDashboard: React.FC = () => {
         setIsLoading(true);
         console.log('Fetching users from Supabase...');
         
+        // First, get the total count for pagination
+        const countResponse = await supabase
+          .from('users')
+          .select('*', { count: 'exact', head: true });
+        
+        if (countResponse.error) {
+          console.error('Error counting users:', countResponse.error);
+          toast.error('Error loading participant count');
+          return;
+        }
+        
+        const totalCount = countResponse.count || 0;
+        setTotalUsers(totalCount);
+        setTotalPages(Math.ceil(totalCount / usersPerPage));
+        
+        // Now fetch the current page
+        const start = (currentPage - 1) * usersPerPage;
+        const end = start + usersPerPage - 1;
+        
         const { data, error } = await supabase
           .from('users')
           .select('*')
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .range(start, end);
         
         if (error) {
           console.error('Error fetching users:', error);
@@ -48,7 +84,7 @@ const AdminDashboard: React.FC = () => {
           return;
         }
         
-        console.log('Fetched data:', data);
+        console.log(`Fetched ${data?.length} users for page ${currentPage}`);
         
         if (data) {
           // Map Supabase data format to our User type
@@ -64,7 +100,6 @@ const AdminDashboard: React.FC = () => {
             createdAt: user.created_at,
           }));
           
-          console.log('Formatted users:', formattedUsers);
           setUsers(formattedUsers);
         }
       } catch (error) {
@@ -76,7 +111,7 @@ const AdminDashboard: React.FC = () => {
     };
     
     fetchUsers();
-  }, [navigate]);
+  }, [navigate, currentPage]);
   
   const handleLogout = () => {
     localStorage.removeItem('mawadhaAdminAuthenticated');
@@ -103,6 +138,58 @@ const AdminDashboard: React.FC = () => {
       `${user.countryCode}${user.whatsapp}`.includes(searchTermLower)
     );
   });
+  
+  // Handle page changes
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+  
+  // Generate page numbers to display
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 5; // Max number of page links to show
+    
+    // Always show first page
+    pages.push(1);
+    
+    // Calculate range of pages to show around current page
+    let startPage = Math.max(2, currentPage - Math.floor(maxVisiblePages / 2));
+    let endPage = Math.min(totalPages - 1, startPage + maxVisiblePages - 3);
+    
+    // Adjust if we're near the start
+    if (startPage === 2) {
+      endPage = Math.min(totalPages - 1, maxVisiblePages - 1);
+    }
+    
+    // Adjust if we're near the end
+    if (endPage === totalPages - 1) {
+      startPage = Math.max(2, totalPages - maxVisiblePages + 2);
+    }
+    
+    // Add ellipsis after first page if needed
+    if (startPage > 2) {
+      pages.push('ellipsis1');
+    }
+    
+    // Add page numbers between ellipses
+    for (let i = startPage; i <= endPage; i++) {
+      pages.push(i);
+    }
+    
+    // Add ellipsis before last page if needed
+    if (endPage < totalPages - 1) {
+      pages.push('ellipsis2');
+    }
+    
+    // Always show last page if we have more than one page
+    if (totalPages > 1) {
+      pages.push(totalPages);
+    }
+    
+    return pages;
+  };
   
   return (
     <div className="container mx-auto p-4">
@@ -133,7 +220,7 @@ const AdminDashboard: React.FC = () => {
                 className="max-w-sm"
               />
               <div className="text-sm text-muted-foreground">
-                Total Participants: <span className="font-bold">{users.length}</span>
+                Total Participants: <span className="font-bold">{totalUsers}</span>
               </div>
             </div>
             
@@ -175,6 +262,48 @@ const AdminDashboard: React.FC = () => {
                 </TableBody>
               </Table>
             </div>
+            
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <Pagination className="mt-4">
+                <PaginationContent>
+                  {/* Previous button */}
+                  <PaginationItem>
+                    <PaginationPrevious 
+                      onClick={() => goToPage(currentPage - 1)}
+                      className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                  
+                  {/* Page numbers */}
+                  {getPageNumbers().map((page, i) => (
+                    page === 'ellipsis1' || page === 'ellipsis2' ? (
+                      <PaginationItem key={`ellipsis-${i}`}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    ) : (
+                      <PaginationItem key={`page-${page}`}>
+                        <PaginationLink
+                          isActive={page === currentPage}
+                          onClick={() => goToPage(Number(page))}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    )
+                  ))}
+                  
+                  {/* Next button */}
+                  <PaginationItem>
+                    <PaginationNext
+                      onClick={() => goToPage(currentPage + 1)}
+                      className={currentPage === totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    />
+                  </PaginationItem>
+                </PaginationContent>
+              </Pagination>
+            )}
             
             {selectedUser && (
               <div className="mt-6 p-4 border rounded-lg bg-muted">
@@ -236,7 +365,7 @@ const AdminDashboard: React.FC = () => {
             </div>
             
             <div className="text-sm text-center text-muted-foreground">
-              Total entries in lucky draw: {users.length}
+              Total entries in lucky draw: {totalUsers}
             </div>
           </TabsContent>
         </Tabs>
