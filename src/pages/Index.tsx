@@ -46,13 +46,13 @@ const Index = () => {
         </div>
       </div>
       
-      <RegistrationForm />
-      
-      <div className="mt-6 text-center text-white text-sm">
+      <div className="text-center text-white text-xs mb-2">
         <p>
           Already registered? <Link to="/coupon-status" className="text-mawadha-secondary underline">Check your coupon status</Link>
         </p>
       </div>
+      
+      <RegistrationForm />
       
       <div className={`mt-4 text-center w-full fixed bottom-0 p-2 ${isMobile ? 'flex flex-col gap-2' : 'flex justify-between items-center'}`}>
         <div className={`${isMobile ? 'mb-1' : 'w-20'}`}>
