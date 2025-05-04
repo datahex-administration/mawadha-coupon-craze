@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -35,6 +34,9 @@ const AdminDashboard: React.FC = () => {
     // Load user data from Supabase
     const fetchUsers = async () => {
       try {
+        setIsLoading(true);
+        console.log('Fetching users from Supabase...');
+        
         const { data, error } = await supabase
           .from('users')
           .select('*')
@@ -45,6 +47,8 @@ const AdminDashboard: React.FC = () => {
           toast.error('Error loading participants data');
           return;
         }
+        
+        console.log('Fetched data:', data);
         
         if (data) {
           // Map Supabase data format to our User type
@@ -60,6 +64,7 @@ const AdminDashboard: React.FC = () => {
             createdAt: user.created_at,
           }));
           
+          console.log('Formatted users:', formattedUsers);
           setUsers(formattedUsers);
         }
       } catch (error) {
@@ -148,7 +153,7 @@ const AdminDashboard: React.FC = () => {
                   {filteredUsers.length > 0 ? (
                     filteredUsers.map((user) => (
                       <TableRow 
-                        key={user.couponCode}
+                        key={user.id || user.couponCode}
                         onClick={() => setSelectedUser(user)}
                         className="cursor-pointer hover:bg-muted"
                       >
