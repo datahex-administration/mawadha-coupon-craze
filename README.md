@@ -1,8 +1,18 @@
+
 # Welcome to your Lovable project
 
 ## Project info
 
 **URL**: https://lovable.dev/projects/cfa971f2-fde7-48ce-8425-76fa65567e12
+
+## Environment Variables
+
+This project uses environment variables for configuration:
+
+- `VITE_SUPABASE_URL`: Your Supabase project URL
+- `VITE_SUPABASE_ANON_KEY`: Your Supabase anonymous key
+
+During development, these values default to the project configuration if not provided. For production, please set these environment variables properly.
 
 ## How can I edit this code?
 
