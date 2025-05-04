@@ -2,9 +2,11 @@
 import React, { useEffect } from 'react';
 import AdminLogin from '@/components/AdminLogin';
 import { useNavigate } from 'react-router-dom';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const AdminPage: React.FC = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     // Check if admin is already logged in
@@ -24,7 +26,7 @@ const AdminPage: React.FC = () => {
     >
       <AdminLogin />
       
-      <div className="mt-4 text-center w-full fixed bottom-0 p-2">
+      <div className={`mt-4 text-center w-full fixed bottom-0 p-2 ${isMobile ? 'pb-4' : ''}`}>
         <a 
           href="https://datahex.co" 
           target="_blank" 

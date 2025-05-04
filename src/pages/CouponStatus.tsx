@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -7,12 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { countryCodes } from '@/utils/countryCodes';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const CouponStatus: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [countryCode, setCountryCode] = useState('+971');
   const [isSearching, setIsSearching] = useState(false);
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   const handleSearch = async () => {
     setIsSearching(true);
@@ -131,7 +132,8 @@ const CouponStatus: React.FC = () => {
         </div>
       </div>
       
-      <div className="mt-4 text-center w-full fixed bottom-0 p-2">
+      <div className={`mt-4 text-center w-full fixed bottom-0 p-2 ${isMobile ? 'flex flex-col gap-1' : 'flex justify-between items-center'}`}>
+        <div className={`${isMobile ? 'mb-1' : 'w-20'}`}></div>
         <a 
           href="https://datahex.co" 
           target="_blank" 
@@ -140,6 +142,7 @@ const CouponStatus: React.FC = () => {
         >
           Powered by DataHex
         </a>
+        <div className={`${isMobile ? 'hidden' : 'w-20'}`}></div>
       </div>
     </div>
   );

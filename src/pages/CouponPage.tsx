@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import CouponCard from '@/components/CouponCard';
 import { User } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const CouponPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -13,6 +13,7 @@ const CouponPage: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const couponCode = searchParams.get('code');
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -136,15 +137,17 @@ const CouponPage: React.FC = () => {
         </Button>
       </div>
       
-      <div className="mt-4 text-center w-full fixed bottom-0 p-2">
-        <a 
-          href="https://datahex.co" 
-          target="_blank" 
-          rel="noopener noreferrer" 
-          className="text-white font-medium hover:text-blue-300 transition-colors"
-        >
-          Powered by DataHex
-        </a>
+      <div className={`mt-4 text-center w-full fixed bottom-0 p-2 ${isMobile ? 'flex flex-col gap-1' : 'flex justify-between items-center'}`}>
+        <div className={`${isMobile ? 'mb-1' : 'w-20'}`}>
+          <a 
+            href="https://datahex.co" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="text-white font-medium hover:text-blue-300 transition-colors"
+          >
+            Powered by DataHex
+          </a>
+        </div>
       </div>
     </div>
   );

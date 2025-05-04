@@ -2,8 +2,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import RegistrationForm from '@/components/RegistrationForm';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index = () => {
+  const isMobile = useIsMobile();
+  
   return (
     <div 
       className="min-h-screen flex flex-col items-center justify-center p-6"
@@ -51,8 +54,8 @@ const Index = () => {
         </p>
       </div>
       
-      <div className="mt-4 text-center w-full fixed bottom-0 p-2 flex justify-between items-center">
-        <div className="w-20">
+      <div className={`mt-4 text-center w-full fixed bottom-0 p-2 ${isMobile ? 'flex flex-col gap-2' : 'flex justify-between items-center'}`}>
+        <div className={`${isMobile ? 'mb-1' : 'w-20'}`}>
           <Link 
             to="/admin" 
             className="text-white/70 text-xs hover:text-white transition-colors"
@@ -68,7 +71,7 @@ const Index = () => {
         >
           Powered by DataHex
         </a>
-        <div className="w-20"></div>
+        <div className={`${isMobile ? 'hidden' : 'w-20'}`}></div>
       </div>
     </div>
   );
