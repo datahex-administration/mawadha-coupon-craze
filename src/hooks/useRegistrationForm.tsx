@@ -82,9 +82,11 @@ export function useRegistrationForm() {
       
       // Insert user data into Supabase
       console.log("Inserting new user:", user);
-      const { error } = await supabase
+      const { data: insertedUser, error } = await supabase
         .from('users')
-        .insert([user]);
+        .insert([user])
+        .select('coupon_code')
+        .single();
       
       if (error) {
         console.error("Supabase insert error:", error);
@@ -93,12 +95,18 @@ export function useRegistrationForm() {
         return;
       }
       
+      console.log("Registration successful, inserted user:", insertedUser);
+      
       // Redirect to coupon page with the data
-      console.log("Registration successful, redirecting to coupon:", couponCode);
       toast.success('Registration successful!');
-      setTimeout(() => {
-        navigate(`/coupon?code=${couponCode}`);
-      }, 1000);
+      
+      // Use the inserted user's coupon code if available, otherwise use the generated one
+      const finalCouponCode = insertedUser?.coupon_code || couponCode;
+      console.log("Redirecting to coupon:", finalCouponCode);
+      
+      // Immediate redirect to coupon page
+      navigate(`/coupon?code=${finalCouponCode}`);
+      
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("There was an error submitting your information. Please try again.");

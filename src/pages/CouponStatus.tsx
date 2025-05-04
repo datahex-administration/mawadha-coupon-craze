@@ -37,14 +37,15 @@ const CouponStatus: React.FC = () => {
     }
     
     try {
-      // Search for user by phone number and country code in Supabase
-      console.log(`Searching for user with country_code=${countryCode}, whatsapp=${phoneNumber}`);
+      // Trim the phone number to remove any spaces
+      const trimmedPhoneNumber = phoneNumber.trim();
+      console.log(`Searching for user with country_code=${countryCode}, whatsapp=${trimmedPhoneNumber}`);
       
       const { data, error } = await supabase
         .from('users')
         .select('coupon_code, name')
         .eq('country_code', countryCode)
-        .eq('whatsapp', phoneNumber.trim())
+        .eq('whatsapp', trimmedPhoneNumber)
         .maybeSingle();
         
       console.log("Search result:", data, error);

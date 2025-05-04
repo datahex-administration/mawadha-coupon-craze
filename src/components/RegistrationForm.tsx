@@ -15,6 +15,7 @@ const RegistrationForm: React.FC = () => {
   const [step, setStep] = useState(1);
   
   const handleNext = () => {
+    // Trigger validation on first page fields
     form.trigger(['name', 'countryCode', 'whatsapp']);
     const hasErrors = !!form.formState.errors.name || 
                      !!form.formState.errors.countryCode || 
