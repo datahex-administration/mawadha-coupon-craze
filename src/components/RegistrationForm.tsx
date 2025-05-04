@@ -30,7 +30,7 @@ const formSchema = z.object({
   maritalStatus: z.enum(["Single", "Engaged", "Married"], {
     required_error: "Please select your marital status.",
   }),
-  attractionReason: z.string().min(5, { message: "Please let us know what attracts you to Mawadha." }),
+  attractionReason: z.string().min(0, { message: "Please let us know what attracts you to Mawadha." }),
 });
 
 const RegistrationForm: React.FC = () => {
