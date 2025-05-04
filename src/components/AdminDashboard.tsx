@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -41,6 +42,8 @@ const AdminDashboard: React.FC = () => {
   
   const fetchUsers = async () => {
     setIsLoading(true);
+    console.log("Fetching users for page:", currentPage);
+    
     try {
       // Get the total count first for pagination
       const { count, error: countError } = await supabase
@@ -53,6 +56,8 @@ const AdminDashboard: React.FC = () => {
         return;
       }
       
+      console.log("Total user count:", count);
+      
       if (count !== null) {
         setTotalPages(Math.ceil(count / itemsPerPage));
       }
@@ -60,6 +65,8 @@ const AdminDashboard: React.FC = () => {
       // Now get the actual data for the current page
       const from = (currentPage - 1) * itemsPerPage;
       const to = from + itemsPerPage - 1;
+      
+      console.log(`Fetching users from ${from} to ${to}`);
       
       const { data, error } = await supabase
         .from('users')
@@ -72,6 +79,8 @@ const AdminDashboard: React.FC = () => {
         toast.error('Failed to load user data');
         return;
       }
+      
+      console.log("Fetched users data:", data);
       
       if (data) {
         // Convert snake_case to camelCase for frontend
@@ -87,6 +96,7 @@ const AdminDashboard: React.FC = () => {
           createdAt: user.created_at
         }));
         
+        console.log("Formatted users:", formattedUsers);
         setUsers(formattedUsers);
       }
     } catch (error) {
@@ -190,7 +200,7 @@ const AdminDashboard: React.FC = () => {
               className="max-w-sm"
             />
             <div className="text-sm text-muted-foreground">
-              Total Participants: <span className="font-bold">{users.length}</span>
+              Total Participants: <span className="font-bold">{users.length > 0 ? totalPages * itemsPerPage : 0}</span>
             </div>
           </div>
           
@@ -249,16 +259,32 @@ const AdminDashboard: React.FC = () => {
                   />
                 </PaginationItem>
                 
-                {[...Array(totalPages)].map((_, i) => (
-                  <PaginationItem key={i}>
-                    <PaginationLink 
-                      onClick={() => setCurrentPage(i + 1)}
-                      isActive={currentPage === i + 1}
-                    >
-                      {i + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  // Show pages around current page
+                  let pageToShow = currentPage;
+                  if (currentPage < 3) {
+                    pageToShow = i + 1;
+                  } else if (currentPage > totalPages - 2) {
+                    pageToShow = totalPages - 4 + i;
+                  } else {
+                    pageToShow = currentPage - 2 + i;
+                  }
+                  
+                  // Ensure page is in valid range
+                  if (pageToShow > 0 && pageToShow <= totalPages) {
+                    return (
+                      <PaginationItem key={i}>
+                        <PaginationLink 
+                          onClick={() => setCurrentPage(pageToShow)}
+                          isActive={currentPage === pageToShow}
+                        >
+                          {pageToShow}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  }
+                  return null;
+                })}
                 
                 <PaginationItem>
                   <PaginationNext 
