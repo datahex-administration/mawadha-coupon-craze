@@ -20,6 +20,7 @@ const CouponStatus: React.FC = () => {
 
   const handleSearch = async () => {
     setIsSearching(true);
+    console.log("Searching for:", { countryCode, phoneNumber });
     
     // Simple validation for phone format
     if (phoneNumber.trim().length < 5) {
@@ -37,13 +38,17 @@ const CouponStatus: React.FC = () => {
     
     try {
       // Search for user by phone number and country code in Supabase
+      console.log(`Searching for user with country_code=${countryCode}, whatsapp=${phoneNumber}`);
+      
       const { data, error } = await supabase
         .from('users')
-        .select('coupon_code')
+        .select('coupon_code, name')
         .eq('country_code', countryCode)
-        .eq('whatsapp', phoneNumber)
+        .eq('whatsapp', phoneNumber.trim())
         .maybeSingle();
         
+      console.log("Search result:", data, error);
+      
       if (error) {
         console.error('Error searching for coupon:', error);
         toast.error('An error occurred while searching');
@@ -53,7 +58,7 @@ const CouponStatus: React.FC = () => {
       
       if (data) {
         // User found, redirect to their coupon
-        toast.success('Coupon found!');
+        toast.success(`Coupon found for ${data.name || 'your number'}!`);
         setTimeout(() => {
           navigate(`/coupon?code=${data.coupon_code}`);
         }, 1000);

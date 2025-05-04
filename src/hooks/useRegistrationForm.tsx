@@ -25,6 +25,7 @@ export function useRegistrationForm() {
   });
 
   const onSubmit = async (values: RegistrationFormValues) => {
+    console.log("Form submission started with values:", values);
     setIsSubmitting(true);
     
     // Validate phone number based on country code
@@ -36,11 +37,12 @@ export function useRegistrationForm() {
     
     // Generate coupon code
     const couponCode = generateCouponCode(values.name);
+    console.log("Generated coupon code:", couponCode);
     
     // Create user object
     const user = {
       name: values.name,
-      whatsapp: values.whatsapp,
+      whatsapp: values.whatsapp.trim(),
       country_code: values.countryCode,
       age: parseInt(values.age),
       marital_status: values.maritalStatus,
@@ -50,15 +52,26 @@ export function useRegistrationForm() {
     
     try {
       // Check if the user already exists with this phone number
-      const { data: existingUser } = await supabase
+      console.log("Checking for existing user with:", values.countryCode, values.whatsapp);
+      const { data: existingUser, error: lookupError } = await supabase
         .from('users')
         .select('coupon_code')
         .eq('country_code', values.countryCode)
-        .eq('whatsapp', values.whatsapp)
+        .eq('whatsapp', values.whatsapp.trim())
         .maybeSingle();
+      
+      console.log("Existing user check result:", existingUser, lookupError);
+      
+      if (lookupError) {
+        console.error("Error checking existing user:", lookupError);
+        toast.error("Error checking registration. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
       
       if (existingUser) {
         // User already exists, redirect to their coupon
+        console.log("User already exists, redirecting to coupon:", existingUser.coupon_code);
         toast.success('You are already registered. Redirecting to your coupon!');
         setTimeout(() => {
           navigate(`/coupon?code=${existingUser.coupon_code}`);
@@ -68,18 +81,20 @@ export function useRegistrationForm() {
       }
       
       // Insert user data into Supabase
+      console.log("Inserting new user:", user);
       const { error } = await supabase
         .from('users')
         .insert([user]);
       
       if (error) {
-        console.error("Supabase error:", error);
+        console.error("Supabase insert error:", error);
         toast.error("Error registering. Please try again.");
         setIsSubmitting(false);
         return;
       }
       
       // Redirect to coupon page with the data
+      console.log("Registration successful, redirecting to coupon:", couponCode);
       toast.success('Registration successful!');
       setTimeout(() => {
         navigate(`/coupon?code=${couponCode}`);
