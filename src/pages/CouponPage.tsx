@@ -135,6 +135,17 @@ const CouponPage: React.FC = () => {
           Back to Home
         </Button>
       </div>
+      
+      <div className="mt-4 text-center w-full fixed bottom-0 p-2">
+        <a 
+          href="https://datahex.co" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-white font-medium hover:text-blue-300 transition-colors"
+        >
+          Powered by DataHex
+        </a>
+      </div>
     </div>
   );
 };
