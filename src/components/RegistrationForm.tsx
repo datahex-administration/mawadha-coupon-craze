@@ -13,6 +13,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Form,
   FormControl,
@@ -77,27 +78,52 @@ const RegistrationForm: React.FC = () => {
     };
     
     try {
-      // In a real app, here we would save the data to Supabase
-      console.log("User data to save:", user);
+      // Check if phone number already exists in Supabase
+      const { data: existingUsers, error: fetchError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('whatsapp', values.whatsapp)
+        .eq('country_code', values.countryCode);
       
-      // Store in localStorage for demo
-      const existingUsers = JSON.parse(localStorage.getItem('mawadhaUsers') || '[]');
+      if (fetchError) {
+        console.error("Error checking for existing user:", fetchError);
+        toast.error("There was an error checking your information. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
       
-      // Check if phone number already exists
-      const phoneExists = existingUsers.some(
-        (u: User) => u.countryCode === user.countryCode && u.whatsapp === user.whatsapp
-      );
-      
-      if (phoneExists) {
+      // If phone number already exists
+      if (existingUsers && existingUsers.length > 0) {
         toast.error("This phone number is already registered");
         setIsSubmitting(false);
         return;
       }
       
-      // Add new user
-      localStorage.setItem('mawadhaUsers', JSON.stringify([...existingUsers, user]));
+      // Insert new user into Supabase
+      const { error: insertError } = await supabase
+        .from('users')
+        .insert([{
+          name: user.name,
+          whatsapp: user.whatsapp,
+          country_code: user.countryCode,
+          age: user.age,
+          marital_status: user.maritalStatus,
+          attraction_reason: user.attractionReason,
+          coupon_code: user.couponCode,
+        }]);
       
-      // Redirect to coupon page with the data
+      if (insertError) {
+        console.error("Error submitting form:", insertError);
+        toast.error("There was an error submitting your information. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Store in localStorage for backward compatibility (can be removed later)
+      const existingLocalUsers = JSON.parse(localStorage.getItem('mawadhaUsers') || '[]');
+      localStorage.setItem('mawadhaUsers', JSON.stringify([...existingLocalUsers, user]));
+      
+      // Redirect to coupon page with the code
       navigate(`/coupon?code=${couponCode}`);
     } catch (error) {
       console.error("Error submitting form:", error);
