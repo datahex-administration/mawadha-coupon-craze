@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -55,29 +54,30 @@ const RegistrationForm: React.FC = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     
-    // Validate phone number based on country code
-    if (!validatePhoneNumber(values.whatsapp, values.countryCode)) {
-      toast.error("Invalid phone number for selected country code");
-      setIsSubmitting(false);
-      return;
-    }
-    
-    // Generate coupon code
-    const couponCode = generateCouponCode(values.name);
-    
-    // Create user object
-    const user: User = {
-      name: values.name,
-      whatsapp: values.whatsapp,
-      countryCode: values.countryCode,
-      age: parseInt(values.age),
-      maritalStatus: values.maritalStatus as 'Single' | 'Engaged' | 'Married',
-      attractionReason: values.attractionReason,
-      couponCode: couponCode,
-      createdAt: new Date().toISOString(),
-    };
-    
     try {
+      // Validate phone number based on country code
+      if (!validatePhoneNumber(values.whatsapp, values.countryCode)) {
+        toast.error("Invalid phone number for selected country code");
+        setIsSubmitting(false);
+        return;
+      }
+      
+      // Generate coupon code
+      const couponCode = generateCouponCode(values.name);
+      console.log("Generated coupon code:", couponCode);
+      
+      // Create user object
+      const user: User = {
+        name: values.name,
+        whatsapp: values.whatsapp,
+        countryCode: values.countryCode,
+        age: parseInt(values.age),
+        maritalStatus: values.maritalStatus as 'Single' | 'Engaged' | 'Married',
+        attractionReason: values.attractionReason,
+        couponCode: couponCode,
+        createdAt: new Date().toISOString(),
+      };
+      
       // Check if phone number already exists in Supabase
       const { data: existingUsers, error: fetchError } = await supabase
         .from('users')
@@ -94,10 +94,13 @@ const RegistrationForm: React.FC = () => {
       
       // If phone number already exists
       if (existingUsers && existingUsers.length > 0) {
+        console.log("Phone number already exists:", existingUsers);
         toast.error("This phone number is already registered");
         setIsSubmitting(false);
         return;
       }
+      
+      console.log("Inserting new user:", user);
       
       // Insert new user into Supabase
       const { data: insertedUser, error: insertError } = await supabase
@@ -111,8 +114,7 @@ const RegistrationForm: React.FC = () => {
           attraction_reason: user.attractionReason,
           coupon_code: user.couponCode,
         }])
-        .select()
-        .single();
+        .select();
       
       if (insertError) {
         console.error("Error submitting form:", insertError);
@@ -127,11 +129,17 @@ const RegistrationForm: React.FC = () => {
       const existingLocalUsers = JSON.parse(localStorage.getItem('mawadhaUsers') || '[]');
       localStorage.setItem('mawadhaUsers', JSON.stringify([...existingLocalUsers, user]));
       
+      // Success message
+      toast.success("Registration successful!");
+      
       // Redirect to coupon page with the code
+      console.log("Redirecting to coupon page with code:", couponCode);
       navigate(`/coupon?code=${couponCode}`);
+      
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error("There was an error submitting your information. Please try again.");
+      setIsSubmitting(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -145,6 +153,7 @@ const RegistrationForm: React.FC = () => {
       
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          
           <FormField
             control={form.control}
             name="name"

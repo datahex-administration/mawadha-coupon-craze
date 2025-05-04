@@ -17,6 +17,8 @@ const CouponPage: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       if (!couponCode) {
+        console.error('No coupon code provided in URL');
+        toast.error('Coupon code is missing');
         navigate('/');
         return;
       }
