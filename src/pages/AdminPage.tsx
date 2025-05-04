@@ -24,7 +24,7 @@ const AdminPage: React.FC = () => {
     >
       <AdminLogin />
       
-      <div className="mt-4 text-center w-full bg-blue-600 p-2 fixed bottom-0">
+      <div className="mt-4 text-center w-full fixed bottom-0 p-2">
         <a 
           href="https://datahex.co" 
           target="_blank" 
