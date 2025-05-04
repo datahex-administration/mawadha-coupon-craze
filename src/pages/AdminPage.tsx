@@ -24,12 +24,12 @@ const AdminPage: React.FC = () => {
     >
       <AdminLogin />
       
-      <div className="mt-4 text-center">
+      <div className="mt-4 text-center w-full bg-blue-600 p-2 fixed bottom-0">
         <a 
           href="https://datahex.co" 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="text-mawadha-secondary font-medium hover:text-mawadha-secondary/80 transition-colors"
+          className="text-white font-medium hover:text-white/80 transition-colors"
         >
           Powered by DataHex
         </a>
