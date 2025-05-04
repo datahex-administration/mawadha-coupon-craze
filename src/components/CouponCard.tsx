@@ -45,25 +45,15 @@ const CouponCard: React.FC<CouponCardProps> = ({ couponCode }) => {
         <div className="bg-mawadha-primary p-6 text-center">
           <Logo />
           <h1 className="text-white text-3xl font-bold mb-1">GIFT VOUCHER</h1>
-          <p className="text-mawadha-secondary text-lg font-bold">WORTH ₹25000/-</p>
-          <p className="text-white text-sm">FOR 10 PERSONS</p>
+          <p className="text-mawadha-secondary text-lg font-bold">AED 100/-</p>
+         <p className="text-gray-600 text-sm mt-4">Validity Till: 31/12/25</p>
+            <p className="text-gray-500 text-xs mt-2">T&C Apply*</p>
         </div>
 
         {/* Coupon Body */}
         <div className="bg-mawadha-cream p-6">
           {/* Gold Badge */}
-          <div className="relative -mt-16 mb-4">
-            <div className="absolute -left-3 bg-mawadha-secondary h-1 w-full"></div>
-            <div className="flex justify-center">
-              <div className="bg-mawadha-secondary rounded-full p-8 border-4 border-white shadow-lg relative">
-                <div className="text-center">
-                  <p className="text-white text-sm font-bold">ADDITIONAL VALUE</p>
-                  <p className="text-white text-3xl font-bold">100</p>
-                  <p className="text-white text-xl font-bold">AED/-</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          
 
           {/* Coupon Code */}
           <div className="text-center mt-8">
@@ -71,8 +61,7 @@ const CouponCard: React.FC<CouponCardProps> = ({ couponCode }) => {
             <div className="bg-mawadha-primary text-white text-xl font-mono tracking-wider py-3 px-4 rounded">
               {couponCode}
             </div>
-            <p className="text-gray-600 text-sm mt-4">Validity Till: 31/12/25</p>
-            <p className="text-gray-500 text-xs mt-2">T&C Apply*</p>
+            
           </div>
         </div>
       </div>
