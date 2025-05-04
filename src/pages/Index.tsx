@@ -51,7 +51,25 @@ const Index = () => {
         </p>
       </div>
       
-      {/* Admin button removed as requested */}
+      <div className="mt-4 text-center w-full fixed bottom-0 p-2 flex justify-between items-center">
+        <div className="w-20">
+          <Link 
+            to="/admin" 
+            className="text-white/70 text-xs hover:text-white transition-colors"
+          >
+            Admin
+          </Link>
+        </div>
+        <a 
+          href="https://datahex.co" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-white font-medium hover:text-blue-300 transition-colors"
+        >
+          Powered by DataHex
+        </a>
+        <div className="w-20"></div>
+      </div>
     </div>
   );
 };
