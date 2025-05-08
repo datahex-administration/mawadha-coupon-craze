@@ -3,6 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import RegistrationForm from '@/components/RegistrationForm';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Instagram, Youtube } from 'lucide-react';
 
 const Index = () => {
   const isMobile = useIsMobile();
@@ -53,6 +54,29 @@ const Index = () => {
         <div className="bg-mawadha-secondary text-white inline-block px-4 py-1 md:px-6 md:py-2 rounded-md mb-2 md:mb-4">
           <h3 className="text-sm md:text-lg font-bold">GIFT VOUCHER GIVEAWAY</h3>
         </div>
+        
+        {/* Social Media Links */}
+        <div className="flex justify-center gap-4 my-2">
+          <a 
+            href="https://www.instagram.com/mawadhaofficial?utm_source=qr&igsh=bmgxNGl0MmpjYm92" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="flex items-center gap-1 text-white hover:text-mawadha-secondary transition-colors"
+          >
+            <Instagram size={20} />
+            <span className="text-xs">Follow</span>
+          </a>
+          <a 
+            href="https://youtube.com/@mawadhaofficial?si=TGKKepllEntj_gSy" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            className="flex items-center gap-1 text-white hover:text-mawadha-secondary transition-colors"
+          >
+            <Youtube size={20} />
+            <span className="text-xs">Subscribe</span>
+          </a>
+        </div>
+        
         <div className="mt-2">
           <a 
             href="https://www.mawadha.com/" 
